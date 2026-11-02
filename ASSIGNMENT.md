@@ -108,11 +108,45 @@ Keep it short. Bullet points are fine.
 
 ---
 
-## Submission
+## Submission: one pull request per task
 
-- A Git repo (link or zip) with **commits made as you go**. Please don't squash everything into one commit; we read the history.
-- `README.md` updated with any new setup steps.
-- `DECISIONS.md` at the repo root.
-- Tests runnable with one command (for example `pytest`).
+Work the way you would on a team: each task is its own pull request, reviewed in your own **private** repo.
+
+### Setup (5 min)
+
+Please **don't fork** this repo and don't open pull requests against it. Forks of a public repo are public, so your solution would be visible to other candidates.
+
+1. Create a new **private** GitHub repo (for example `roombook-<your-name>`).
+2. Push this starter's `main` to it:
+   ```bash
+   git clone <this repo URL> roombook && cd roombook
+   git remote set-url origin <your private repo URL>
+   git push -u origin main
+   ```
+3. Add **REVIEWER_GITHUB_USERNAME** as a collaborator with read access.
+
+### Pull requests
+
+Open these PRs against `main`, in this order:
+
+| PR | Branch (suggested) | Contains |
+|---|---|---|
+| 1 | `fix/back-to-back-bookings` | Task 1: the fix, its test, and `DECISIONS.md` with your list of other problems |
+| 2 | `feat/suggest-slots` | Task 2: the `/suggest` endpoint and its tests |
+| 3 | `feat/prevent-double-booking` | Task 3: your double-booking guard |
+| 4 | `feat/find-slot-ui` | Task 4: the React form |
+
+- **Merge each PR into `main` yourself before you start the next one.** Use a normal merge commit, not squash, so we can see your commits.
+- **Commit as you go** inside each PR. Please don't squash a whole task into one commit; we read the history.
+- **Each PR description** should say, in a few lines:
+  - what changed, and why this way
+  - how to test it (commands, or steps in the UI)
+  - how you used AI for this task, if at all
+- Add to `DECISIONS.md` in the PR it relates to (Task 5), rather than writing it all at the end.
+- Keep `README.md` up to date with any new setup steps, and keep tests runnable with one command (for example `pytest`).
+
+If you run out of time, open the unfinished PR as a **draft** and say in its description what's left.
+
+When you're done, send us the link to your private repo.
 
 Questions about the spec? Make an assumption, write it down, and keep going. That's part of the exercise.
