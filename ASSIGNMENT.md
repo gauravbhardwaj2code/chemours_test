@@ -1,0 +1,118 @@
+# RoomBook: take-home assignment
+
+RoomBook is a small meeting-room booking app. You'll get a working starter repo, then fix a bug, build a slot-finding API, make booking safe under concurrency, and add a small React UI.
+
+- **Stack:** FastAPI (Python 3.11+), SQLAlchemy, PostgreSQL (via `docker compose`) or SQLite, React + Vite
+- **Time box:** 3–4 hours. Please stop at 4 hours. Unfinished parts are fine if DECISIONS.md says what you would do next.
+- **AI tools:** allowed. Tell us how you used them (see Task 5).
+- **After you submit:** a 60-minute call where you walk us through your code and make a few small changes to it live, on screen share. Please be ready to run the app and tests locally during that call.
+
+---
+
+## The starter repo
+
+```
+backend/    FastAPI app, models, seed data, pytest tests
+frontend/   React app (Vite)
+```
+
+It already has:
+
+- `GET/POST /rooms`, `GET/POST /bookings`, `GET /users`
+- Users have a `role`: `employee`, `manager` or `intern`
+- A booking has a room, a start, an end, a creator and a list of attendees (users)
+- A React page that lists rooms and the bookings for a chosen date
+- A seed script with sample rooms, users and bookings
+
+See `README.md` in the starter repo for setup commands.
+
+### Office rules (apply to everything below)
+
+- Office time is **IST (Asia/Kolkata)**. Working hours are **09:30–18:30 IST**, Monday to Friday.
+- Times are half-open intervals: a meeting from 10:00 to 11:00 does **not** clash with one from 11:00 to 12:00.
+- Durations are multiples of 15 minutes, from 15 to 240.
+
+---
+
+## Task 1: Fix the reported bug (~30 min)
+
+A user reported: **"Back-to-back bookings are rejected. I can't book 11:00–12:00 when someone has 10:00–11:00."**
+
+1. Fix it.
+2. Add a test that would have caught it.
+3. In `DECISIONS.md`, list **any other problems you notice** in the codebase (bugs, risks, missing validation). You don't have to fix them, but say how serious you think each one is.
+
+## Task 2: "Find me a slot" API (~1.5 hrs)
+
+Add `POST /rooms/{room_id}/suggest`.
+
+Request:
+
+```json
+{
+  "requester_id": 3,
+  "attendee_ids": [1, 2],
+  "duration_minutes": 45,
+  "date": "2026-12-07"
+}
+```
+
+Response: the **first 3** valid slots on that date, earliest first. Return fewer if fewer exist.
+
+```json
+{
+  "slots": [
+    { "start": "2026-12-07T14:00:00+05:30", "end": "2026-12-07T14:45:00+05:30" }
+  ]
+}
+```
+
+A slot is valid only if all of these hold:
+
+- Slot starts fall on 15-minute boundaries (09:30, 09:45, 10:00, ...).
+- The meeting starts and ends within working hours.
+- The room has no overlapping booking.
+- No attendee has an overlapping booking **in any room**.
+- **Cleaning buffer:** a meeting longer than 60 minutes needs a 15-minute cleaning buffer after it, during which the room can't be used.
+- **Restricted room:** users with role `intern` can't book the **Board Room**.
+- **Lunch hour:** no meeting may overlap 13:00–14:00, **unless** it is 30 minutes or shorter.
+
+Where these rules don't say exactly what to do, make a reasonable choice and write it down in DECISIONS.md. Add tests for the rules.
+
+## Task 3: Prevent double booking (~30 min)
+
+If two users book the same room for overlapping times at the same moment, exactly one must succeed. The other gets a clear error (`409 Conflict`).
+
+Choose the approach yourself (database constraint, transaction/locking, or something else). Explain in DECISIONS.md why you chose it and where it would stop working. Add a test if you can.
+
+## Task 4: React UI (~1 hr)
+
+Add a "Find a slot" form:
+
+- Pick a room, attendees, a duration and a date
+- Show the suggested slots
+- Book a slot with one click
+- Handle loading and error states, and the case where **the slot was taken by someone else** between showing it and clicking it
+
+Plain CSS is fine. We care about behaviour, not looks.
+
+## Task 5: DECISIONS.md (~15 min)
+
+Keep it short. Bullet points are fine.
+
+- **Assumptions** you made where the spec was unclear
+- **Trade-offs** you chose, and the alternatives you rejected
+- **Other problems** you noticed (from Task 1)
+- **With more time**, what you'd do next
+- **AI usage:** which tools, for which parts, and **at least one place where the AI was wrong** or you rejected its suggestion, and why
+
+---
+
+## Submission
+
+- A Git repo (link or zip) with **commits made as you go**. Please don't squash everything into one commit; we read the history.
+- `README.md` updated with any new setup steps.
+- `DECISIONS.md` at the repo root.
+- Tests runnable with one command (for example `pytest`).
+
+Questions about the spec? Make an assumption, write it down, and keep going. That's part of the exercise.
